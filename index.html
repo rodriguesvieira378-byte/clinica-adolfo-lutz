@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clínica Médica Adolfo Lutz | Sistema de Gestão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0f3557;--navy2:#174a72;--teal:#1d8b86;--teal2:#14726e;--bg:#f2f6f9;--line:#dbe5ec;--muted:#5f7386;--text:#15304a;--warn:#a46c17;--bad:#a73b3b}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Inter,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:262px;flex-shrink:0;background:linear-gradient(170deg,#0b2c4a,#124a70);color:#fff;padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;overflow-y:auto}
+.logo-card{background:#fff;border-radius:16px;padding:10px 12px;display:block;box-shadow:0 6px 20px #00000030}
+.logo-card img{width:100%;display:block}
+.nav{padding-top:18px;display:grid;gap:3px}
+.nav .group{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#9cc2d6;padding:12px 12px 4px}
+.nav button{width:100%;text-align:left;border:0;background:transparent;color:#d8e9f2;padding:10px 12px;border-radius:10px;font-weight:600;display:flex;gap:10px;align-items:center}
+.nav button .ic{width:18px;text-align:center;opacity:.85}
+.nav button.active,.nav button:hover{background:#ffffff1f;color:#fff}
+.sidefoot{margin-top:auto;padding:16px 10px 4px;font-size:11px;color:#b4d0de;line-height:1.6}
+.main{min-width:0;flex:1}
+.top{background:#fff;padding:18px 30px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:3}
+.top h1{font-size:21px;margin:0}
+.top p{margin:4px 0 0;color:var(--muted);font-size:12.5px}
+.status{display:inline-flex;align-items:center;gap:7px;border-radius:50px;padding:7px 12px;font-size:12px;font-weight:700;white-space:nowrap;border:0;background:#eef3f7;color:var(--muted)}
+.status i{width:8px;height:8px;border-radius:50%;background:currentColor;display:inline-block}
+.status.cloud{background:#e3f4f1;color:#12776f}
+.status.local{background:#fff3de;color:var(--warn)}
+.status.err{background:#fff0f0;color:var(--bad)}
+.content{padding:26px 30px 40px;max-width:1400px;margin:auto}
+.hero{border-radius:18px;background:linear-gradient(110deg,#0f3557,#1a6f86);color:#fff;padding:28px;display:flex;justify-content:space-between;gap:24px;align-items:center;margin-bottom:22px}
+.hero h2{margin:0 0 8px;font-family:"Playfair Display",Georgia,serif;font-size:27px}
+.hero p{margin:0;color:#d5e8f0;line-height:1.6;max-width:620px}
+.hero .heroimg{background:#fff;border-radius:14px;padding:8px;width:190px;flex-shrink:0}
+.hero .heroimg img{width:100%;display:block}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:22px}
+.stat,.panel{background:#fff;border:1px solid var(--line);border-radius:15px;box-shadow:0 3px 12px #17324b08}
+.stat{padding:18px}
+.stat span{font-size:12.5px;color:var(--muted)}
+.stat strong{display:block;font-size:30px;margin-top:6px;color:var(--navy)}
+.stat em{display:block;font-style:normal;font-size:11px;color:var(--teal);margin-top:4px}
+.panel{padding:20px;margin-bottom:20px}
+.panelhead{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.panel h2{font-size:17px;margin:0}
+.panel h3{font-size:15px;margin:0 0 8px}
+.muted{color:var(--muted);font-size:13px}
+.primary{background:var(--teal);color:#fff;border:0;border-radius:9px;padding:10px 15px;font-weight:700}
+.primary:hover{background:var(--teal2)}
+.primary:disabled{opacity:.6;cursor:default}
+.secondary{background:#edf4f8;color:var(--navy);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-weight:600}
+.secondary:hover{background:#e2edf4}
+.danger{color:var(--bad);background:#fff0f0;border:1px solid #f0d0d0;border-radius:8px;padding:8px 12px;font-weight:600}
+.actions{display:flex;gap:6px;flex-wrap:wrap}
+.search{border:1px solid var(--line);border-radius:9px;padding:10px 12px;width:300px;max-width:100%;outline-color:var(--teal);background:#fff}
+.tablewrap{overflow:auto}
+table{width:100%;border-collapse:collapse;text-align:left}
+th{font-size:11.5px;color:var(--muted);background:#f6f9fb;padding:12px;font-weight:700;white-space:nowrap}
+td{border-top:1px solid #edf1f5;padding:11px 12px;font-size:13px;vertical-align:middle}
+td button{font-size:12px}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:12px}
+.pill{display:inline-block;background:#eaf4fa;color:#1a6388;padding:5px 9px;border-radius:30px;font-size:11px;font-weight:700;white-space:nowrap}
+.pill.good{background:#e5f6ef;color:#16815d}
+.pill.warn{background:#fff3de;color:var(--warn)}
+.pill.bad{background:#fff0f0;color:var(--bad)}
+.empty{padding:24px;color:var(--muted);text-align:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.wide{grid-column:1/-1}
+.field label{font-size:12px;font-weight:700;color:#38516a}
+.field small{font-size:11px;color:var(--muted)}
+.field input,.field select,.field textarea{width:100%;border:1px solid #cfdee8;border-radius:9px;padding:10px;background:#fff}
+.field input[readonly]{background:#f3f6f8;color:var(--muted)}
+.field textarea{min-height:76px;resize:vertical}
+.formactions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.formerror{display:none;background:#fff0f0;border:1px solid #f0d0d0;color:var(--bad);border-radius:9px;padding:10px 12px;font-size:13px;margin-top:14px}
+.formerror.show{display:block}
+.modalback{position:fixed;inset:0;background:#0a253b99;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}
+.modalback.open{display:flex}
+.modal{width:min(700px,100%);background:#fff;border-radius:17px;padding:24px;max-height:92vh;overflow:auto}
+.modal.small{width:min(430px,100%)}
+.modal h2{margin:0;font-size:19px}
+.notice{background:#fff8e9;border:1px solid #f2dfb4;color:#765c26;padding:12px 14px;border-radius:10px;font-size:12.5px;line-height:1.6;margin-top:16px}
+.notice.info{background:#eef6fb;border-color:#cfe3ef;color:#24577a}
+.smallcard{padding:16px;background:#f5f9fb;border-radius:12px;border:1px solid var(--line)}
+.smallcard p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+.smallcard strong{color:var(--navy)}
+.toast{position:fixed;bottom:22px;right:22px;background:#173e58;color:#fff;padding:13px 18px;border-radius:10px;box-shadow:0 10px 30px #0003;display:none;z-index:30;max-width:420px}
+.toast.show{display:block}
+.toast.bad{background:#8f2f2f}
+.reminder{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #edf1f5}
+.reminder:first-child{border-top:0}
+.login{max-width:420px;margin:10px auto}
+.dbtable{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.dbtable div{background:#f5f9fb;border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;font-size:13px}
+.dbtable b{font-family:ui-monospace,Consolas,monospace;font-size:12px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:30px;padding:7px 12px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.chip.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.chip span{opacity:.75;margin-left:4px}
+.track{display:grid;gap:14px}
+.tcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:0 3px 12px #17324b08}
+.tcard.late{border-color:#f0d0d0}
+.thead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.thead h3{margin:0;font-size:15px}
+.thead p{margin:3px 0 0;color:var(--muted);font-size:12.5px}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);margin:18px 0 4px}
+.step{text-align:center;position:relative;padding:0 4px}
+.step .dot{width:28px;height:28px;border-radius:50%;margin:0 auto;display:grid;place-items:center;background:#e6edf2;color:#8aa0b2;font-size:12px;font-weight:800;position:relative;z-index:1;border:3px solid #fff}
+.step::before{content:'';position:absolute;top:13px;left:-50%;width:100%;height:3px;background:#e6edf2}
+.step:first-child::before{display:none}
+.step.done .dot{background:var(--teal);color:#fff}
+.step.done::before,.step.now::before{background:var(--teal)}
+.step.now .dot{background:#fff;border-color:var(--teal);color:var(--teal);box-shadow:0 0 0 4px #1d8b8622}
+.step b{display:block;font-size:12px;margin-top:7px;color:var(--text)}
+.step small{display:block;color:var(--muted);font-size:11px;margin-top:2px;line-height:1.4}
+.step.todo b{color:#8aa0b2}
+.tfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #edf1f5;font-size:12.5px;color:var(--muted)}
+.cancel{background:#fff0f0;color:var(--bad);border-radius:10px;padding:10px 12px;margin-top:14px;font-size:13px;font-weight:600}
+@media(max-width:1100px){.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:900px){
+ .layout{display:block}
+ .sidebar{width:100%;height:auto;position:static;padding:12px;flex-direction:row;align-items:center;gap:12px;flex-wrap:wrap}
+ .logo-card{width:150px;padding:6px 8px;border-radius:12px}
+ .nav{display:flex;flex-wrap:nowrap;overflow-x:auto;padding:0;width:100%;gap:6px}
+ .nav .group{display:none}
+ .nav button{white-space:nowrap;width:auto;background:#ffffff14;font-size:13px;padding:9px 12px}
+ .sidefoot{display:none}
+ .top{position:static;padding:14px 18px}
+ .content{padding:18px}
+ .grid2,.grid3,.dbtable{grid-template-columns:1fr}
+ .hero .heroimg{display:none}
+}
+@media(max-width:600px){
+ .stats{grid-template-columns:repeat(2,1fr)}
+ .formgrid{grid-template-columns:1fr}
+ .field.wide{grid-column:auto}
+ .top{flex-wrap:wrap}
+ .top h1{font-size:18px}
+ .hero{padding:20px}.hero h2{font-size:22px}
+ .panel{padding:14px}
+ .panelhead .search{width:100%}
+ .panelhead .primary{width:100%}
+ table,tbody{display:block}
+ thead{display:none}
+ tbody tr{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 12px;margin:0 0 10px}
+ tbody td{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border:0;border-bottom:1px solid #eef2f5;padding:9px 2px;overflow-wrap:anywhere;text-align:right}
+ tbody td:last-child{border-bottom:0}
+ tbody td::before{content:attr(data-label);font-weight:700;color:var(--muted);text-align:left;flex:0 0 40%}
+ tbody td.empty{display:block;text-align:center}
+ tbody td.empty::before{display:none}
+ .actions{justify-content:flex-end}
+ .modalback{padding:0;align-items:flex-end}
+ .modal{border-radius:16px 16px 0 0;max-height:94dvh;padding:16px}
+ .formactions{position:sticky;bottom:-16px;background:#fff;padding:10px 0}
+ .formactions button{flex:1}
+ .steps{grid-template-columns:1fr;gap:0;margin:14px 0 0}
+ .step{display:flex;align-items:flex-start;gap:12px;text-align:left;padding:0 0 14px}
+ .step .dot{margin:0;flex-shrink:0}
+ .step::before{top:-14px;left:13px;width:3px;height:28px}
+ .step b{margin-top:4px}
+ .step > div{min-width:0}
+ .toast{left:12px;right:12px;bottom:12px;text-align:center;max-width:none}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+ <aside class="sidebar">
+  <a class="logo-card" href="#inicio" title="Clínica Médica Adolfo Lutz"><img src="data:image/webp;base64,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" alt="Clínica Médica Adolfo Lutz — Tradição na ciência, excelência no cuidado."></a>
+  <nav class="nav" id="nav"></nav>
+  <div class="sidefoot">Tradição na ciência,<br>excelência no cuidado.<br><br>Trabalho acadêmico • Turma TRC1<br>Dados fictícios</div>
+ </aside>
+ <main class="main">
+  <header class="top">
+   <div><h1 id="pageTitle">Visão geral</h1><p>Clínica Médica Adolfo Lutz • Sistema administrativo</p></div>
+   <button class="status" id="status" onclick="go('banco')"><i></i><span>Conectando…</span></button>
+  </header>
+  <div class="content" id="view"></div>
+ </main>
+</div>
+
+<div class="modalback" id="formModal"><div class="modal">
+ <div class="panelhead"><h2 id="modalTitle"></h2><button class="secondary" type="button" onclick="closeForm()">Fechar ✕</button></div>
+ <form id="entityForm" novalidate></form>
+</div></div>
+
+<div class="modalback" id="confirmModal"><div class="modal small">
+ <h2 id="confirmTitle">Confirmar</h2>
+ <p class="muted" id="confirmText" style="line-height:1.6"></p>
+ <div class="formactions"><button class="secondary" type="button" id="confirmNo">Cancelar</button><button class="danger" type="button" id="confirmYes">Confirmar</button></div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+const SEED = {"ESPECIALIDADE": [{"ESPECIALIDADE_ID": 1, "NOME": "Clínica Geral"}, {"ESPECIALIDADE_ID": 2, "NOME": "Cardiologia"}, {"ESPECIALIDADE_ID": 3, "NOME": "Pediatria"}, {"ESPECIALIDADE_ID": 4, "NOME": "Dermatologia"}], "MEDICO": [{"MEDICO_ID": 1, "NOME": "Dra. Ana Martins", "CRM": "000101/SP", "TELEFONE": "11980000101", "ESPECIALIDADE_ID": 1}, {"MEDICO_ID": 2, "NOME": "Dr. Roberto Lima", "CRM": "000102/SP", "TELEFONE": "11980000102", "ESPECIALIDADE_ID": 2}, {"MEDICO_ID": 3, "NOME": "Dra. Paula Nogueira", "CRM": "000103/SP", "TELEFONE": null, "ESPECIALIDADE_ID": 3}, {"MEDICO_ID": 4, "NOME": "Dr. Marcos Ferreira", "CRM": "000104/SP", "TELEFONE": "11980000104", "ESPECIALIDADE_ID": 4}], "PACIENTE": [{"PACIENTE_CPF": "11144477735", "NOME": "Maria Oliveira Santos", "DATA_NASCIMENTO": "1991-04-12", "TELEFONE": "11990000001", "EMAIL": "maria@exemplo.test", "ENDERECO": "Rua das Acácias, 120 – Centro"}, {"PACIENTE_CPF": "22233344405", "NOME": "João Pereira Lima", "DATA_NASCIMENTO": "1984-08-22", "TELEFONE": "11990000002", "EMAIL": "joao@exemplo.test", "ENDERECO": "Av. Brasil, 455 – Jardim América"}, {"PACIENTE_CPF": "33355566607", "NOME": "Ana Beatriz Costa", "DATA_NASCIMENTO": "2000-01-30", "TELEFONE": "11990000003", "EMAIL": null, "ENDERECO": "Rua São Jorge, 78 – Vila Nova"}, {"PACIENTE_CPF": "44466677708", "NOME": "Carlos Eduardo Souza", "DATA_NASCIMENTO": "1975-11-05", "TELEFONE": "11990000004", "EMAIL": "carlos@exemplo.test", "ENDERECO": "Rua Ipê Amarelo, 32 – Bela Vista"}, {"PACIENTE_CPF": "55577788809", "NOME": "Fernanda Alves Rocha", "DATA_NASCIMENTO": "1968-06-17", "TELEFONE": "11990000005", "EMAIL": "fernanda@exemplo.test", "ENDERECO": "Travessa das Flores, 9 – Centro"}], "USUARIO": [{"USUARIO_ID": 1, "EMAIL": "maria@exemplo.test", "SENHA_HASH": "sha256:299fbb455c42239c86d2ee3b15403ed1b468259ecaedf0c3527451e1f0d63d59", "PERFIL": "Paciente", "PACIENTE_CPF": "11144477735", "ATIVO": 1, "DATA_CADASTRO": "2026-11-01T09:00"}, {"USUARIO_ID": 2, "EMAIL": "joao@exemplo.test", "SENHA_HASH": "sha256:299fbb455c42239c86d2ee3b15403ed1b468259ecaedf0c3527451e1f0d63d59", "PERFIL": "Paciente", "PACIENTE_CPF": "22233344405", "ATIVO": 1, "DATA_CADASTRO": "2026-11-02T14:10"}, {"USUARIO_ID": 3, "EMAIL": "recepcao@clinica.test", "SENHA_HASH": "sha256:2b2f7d1f89222d7211f2befb172fa7267c44ef66f9e074a7902dc39ce7c829a2", "PERFIL": "Recepção", "PACIENTE_CPF": null, "ATIVO": 1, "DATA_CADASTRO": "2026-10-20T08:00"}, {"USUARIO_ID": 4, "EMAIL": "admin@clinica.test", "SENHA_HASH": "sha256:240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", "PERFIL": "Administrador", "PACIENTE_CPF": null, "ATIVO": 1, "DATA_CADASTRO": "2026-10-20T08:00"}], "CONSULTA": [{"CONSULTA_ID": 1, "PACIENTE_CPF": "11144477735", "MEDICO_ID": 1, "DATA_CONSULTA": "2026-11-20", "HORA_CONSULTA": "09:00", "ORIGEM": "On-line", "SITUACAO": "Agendada", "JUSTIFICATIVA_FALTA": null, "DATA_LEMBRETE": null}, {"CONSULTA_ID": 2, "PACIENTE_CPF": "22233344405", "MEDICO_ID": 2, "DATA_CONSULTA": "2026-11-20", "HORA_CONSULTA": "14:30", "ORIGEM": "Presencial", "SITUACAO": "Confirmada", "JUSTIFICATIVA_FALTA": null, "DATA_LEMBRETE": "2026-11-19T10:00"}, {"CONSULTA_ID": 3, "PACIENTE_CPF": "33355566607", "MEDICO_ID": 3, "DATA_CONSULTA": "2026-11-21", "HORA_CONSULTA": "10:00", "ORIGEM": "On-line", "SITUACAO": "Agendada", "JUSTIFICATIVA_FALTA": null, "DATA_LEMBRETE": null}, {"CONSULTA_ID": 4, "PACIENTE_CPF": "44466677708", "MEDICO_ID": 1, "DATA_CONSULTA": "2026-11-05", "HORA_CONSULTA": "08:30", "ORIGEM": "Presencial", "SITUACAO": "Realizada", "JUSTIFICATIVA_FALTA": null, "DATA_LEMBRETE": "2026-11-04T09:00"}, {"CONSULTA_ID": 5, "PACIENTE_CPF": "55577788809", "MEDICO_ID": 4, "DATA_CONSULTA": "2026-11-06", "HORA_CONSULTA": "15:00", "ORIGEM": "On-line", "SITUACAO": "Não compareceu", "JUSTIFICATIVA_FALTA": "Paciente informou problema de transporte.", "DATA_LEMBRETE": "2026-11-05T09:15"}, {"CONSULTA_ID": 6, "PACIENTE_CPF": "11144477735", "MEDICO_ID": 2, "DATA_CONSULTA": "2026-11-26", "HORA_CONSULTA": "11:00", "ORIGEM": "Presencial", "SITUACAO": "Agendada", "JUSTIFICATIVA_FALTA": null, "DATA_LEMBRETE": null}], "TIPO_EXAME": [{"TIPO_EXAME_ID": 1, "NOME": "Hemograma completo", "EXIGE_PEDIDO_MEDICO": 1}, {"TIPO_EXAME_ID": 2, "NOME": "Glicemia em jejum", "EXIGE_PEDIDO_MEDICO": 1}, {"TIPO_EXAME_ID": 3, "NOME": "Colesterol total e frações", "EXIGE_PEDIDO_MEDICO": 1}, {"TIPO_EXAME_ID": 4, "NOME": "Exame de urina (EAS)", "EXIGE_PEDIDO_MEDICO": 0}], "LABORATORIO": [{"LABORATORIO_ID": 1, "NOME": "Laboratório Parceiro Alfa", "CNPJ": "00000000000101", "TELEFONE": "1130000001", "EMAIL": "alfa@laboratorio.test"}, {"LABORATORIO_ID": 2, "NOME": "Laboratório Parceiro Beta", "CNPJ": "00000000000102", "TELEFONE": "1130000002", "EMAIL": "beta@laboratorio.test"}, {"LABORATORIO_ID": 3, "NOME": "Laboratório Parceiro Gama", "CNPJ": "00000000000103", "TELEFONE": "1130000003", "EMAIL": "gama@laboratorio.test"}], "EXAME": [{"EXAME_ID": 1, "PACIENTE_CPF": "11144477735", "TIPO_EXAME_ID": 1, "LABORATORIO_ID": null, "ORIGEM": "On-line", "PEDIDO_MEDICO_APRESENTADO": 1, "DATA_AGENDADA": "2026-11-24", "DATA_COLETA": null, "DATA_ENCAMINHAMENTO": null, "PREVISAO_ENTREGA": null, "SITUACAO": "Agendado"}, {"EXAME_ID": 2, "PACIENTE_CPF": "22233344405", "TIPO_EXAME_ID": 2, "LABORATORIO_ID": 2, "ORIGEM": "Presencial", "PEDIDO_MEDICO_APRESENTADO": 1, "DATA_AGENDADA": "2026-11-10", "DATA_COLETA": "2026-11-10", "DATA_ENCAMINHAMENTO": "2026-11-10", "PREVISAO_ENTREGA": "2026-11-23", "SITUACAO": "Em análise"}, {"EXAME_ID": 3, "PACIENTE_CPF": "44466677708", "TIPO_EXAME_ID": 3, "LABORATORIO_ID": 1, "ORIGEM": "Presencial", "PEDIDO_MEDICO_APRESENTADO": 1, "DATA_AGENDADA": "2026-11-03", "DATA_COLETA": "2026-11-03", "DATA_ENCAMINHAMENTO": "2026-11-04", "PREVISAO_ENTREGA": "2026-11-08", "SITUACAO": "Resultado disponível"}, {"EXAME_ID": 4, "PACIENTE_CPF": "55577788809", "TIPO_EXAME_ID": 4, "LABORATORIO_ID": null, "ORIGEM": "On-line", "PEDIDO_MEDICO_APRESENTADO": 0, "DATA_AGENDADA": "2026-11-12", "DATA_COLETA": null, "DATA_ENCAMINHAMENTO": null, "PREVISAO_ENTREGA": null, "SITUACAO": "Aguardando coleta"}, {"EXAME_ID": 5, "PACIENTE_CPF": "11144477735", "TIPO_EXAME_ID": 2, "LABORATORIO_ID": 1, "ORIGEM": "On-line", "PEDIDO_MEDICO_APRESENTADO": 1, "DATA_AGENDADA": "2026-11-04", "DATA_COLETA": "2026-11-04", "DATA_ENCAMINHAMENTO": "2026-11-04", "PREVISAO_ENTREGA": "2026-11-07", "SITUACAO": "Resultado disponível"}], "RESULTADO_EXAME": [{"RESULTADO_ID": 1, "EXAME_ID": 3, "DATA_LIBERACAO": "2026-11-08T16:20", "ARQUIVO_PDF": "resultado_exame_3.pdf", "OBSERVACAO": "Liberado para o paciente."}, {"RESULTADO_ID": 2, "EXAME_ID": 5, "DATA_LIBERACAO": "2026-11-07T11:00", "ARQUIVO_PDF": "resultado_exame_5.pdf", "OBSERVACAO": null}]};
+const LOCAL_KEY = 'adolfo_lutz_db_web_v1';
+const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+
+/* ===== Modelo de dados (igual ao dicionário de dados) ===== */
+const TABLES = ['ESPECIALIDADE','MEDICO','PACIENTE','USUARIO','CONSULTA','TIPO_EXAME','LABORATORIO','EXAME','RESULTADO_EXAME'];
+const COLUMNS = {
+ ESPECIALIDADE:['ESPECIALIDADE_ID','NOME'],
+ MEDICO:['MEDICO_ID','NOME','CRM','TELEFONE','ESPECIALIDADE_ID'],
+ PACIENTE:['PACIENTE_CPF','NOME','DATA_NASCIMENTO','TELEFONE','EMAIL','ENDERECO'],
+ USUARIO:['USUARIO_ID','EMAIL','SENHA_HASH','PERFIL','PACIENTE_CPF','ATIVO','DATA_CADASTRO'],
+ CONSULTA:['CONSULTA_ID','PACIENTE_CPF','MEDICO_ID','DATA_CONSULTA','HORA_CONSULTA','ORIGEM','SITUACAO','JUSTIFICATIVA_FALTA','DATA_LEMBRETE'],
+ TIPO_EXAME:['TIPO_EXAME_ID','NOME','EXIGE_PEDIDO_MEDICO'],
+ LABORATORIO:['LABORATORIO_ID','NOME','CNPJ','TELEFONE','EMAIL'],
+ EXAME:['EXAME_ID','PACIENTE_CPF','TIPO_EXAME_ID','LABORATORIO_ID','ORIGEM','PEDIDO_MEDICO_APRESENTADO','DATA_AGENDADA','DATA_COLETA','DATA_ENCAMINHAMENTO','PREVISAO_ENTREGA','SITUACAO'],
+ RESULTADO_EXAME:['RESULTADO_ID','EXAME_ID','DATA_LIBERACAO','ARQUIVO_PDF','OBSERVACAO']
+};
+const PK = {ESPECIALIDADE:'ESPECIALIDADE_ID',MEDICO:'MEDICO_ID',PACIENTE:'PACIENTE_CPF',USUARIO:'USUARIO_ID',CONSULTA:'CONSULTA_ID',TIPO_EXAME:'TIPO_EXAME_ID',LABORATORIO:'LABORATORIO_ID',EXAME:'EXAME_ID',RESULTADO_EXAME:'RESULTADO_ID'};
+const SIT_CONSULTA = ['Agendada','Confirmada','Realizada','Cancelada','Não compareceu'];
+const SIT_EXAME = ['Agendado','Aguardando coleta','Coletado','Enviado ao laboratório','Em análise','Resultado disponível','Cancelado'];
+const DATETIME_COLS = new Set(['DATA_CADASTRO','DATA_LEMBRETE','DATA_LIBERACAO']);
+
+/* ===== Estado ===== */
+let data = {}; TABLES.forEach(t => data[t] = []);
+let mode = 'loading';           // 'cloud' | 'local' | 'loading'
+let cloud = null, userCap = null, downloadsCap = null;
+let connNote = '';               // '', 'lento', 'erro'
+let readOnly = false;
+let current = 'inicio', searchTerm = '', editing = null, patientSession = null, trackFilter = 'todos';
+
+/* ===== Utilidades ===== */
+const $ = id => document.getElementById(id);
+const esc = x => String(x ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const digits = s => String(s ?? '').replace(/\D/g, '');
+const fmtDate = d => d ? String(d).slice(0,10).split('-').reverse().join('/') : '—';
+const fmtDT = d => d ? fmtDate(d) + ' ' + String(d).slice(11,16) : '—';
+const fmtCPF = c => { c = digits(c); return c.length === 11 ? `${c.slice(0,3)}.${c.slice(3,6)}.${c.slice(6,9)}-${c.slice(9)}` : (c || '—'); };
+const fmtCNPJ = c => { c = digits(c); return c.length === 14 ? `${c.slice(0,2)}.${c.slice(2,5)}.${c.slice(5,8)}/${c.slice(8,12)}-${c.slice(12)}` : (c || '—'); };
+const fmtPhone = p => { p = digits(p); if (p.length === 11) return `(${p.slice(0,2)}) ${p.slice(2,7)}-${p.slice(7)}`; if (p.length === 10) return `(${p.slice(0,2)}) ${p.slice(2,6)}-${p.slice(6)}`; return p || '—'; };
+const yesNo = v => Number(v) === 1 ? 'Sim' : 'Não';
+const pad = n => String(n).padStart(2,'0');
+const nowLocal = () => { const d = new Date(); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const today = () => nowLocal().slice(0,10);
+const addDays = (iso, n) => { const d = new Date(iso + 'T12:00'); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; };
+const find = (t, id) => data[t].find(r => String(r[PK[t]]) === String(id));
+const nameOf = (t, id) => find(t, id)?.NOME || 'Não informado';
+const nextId = t => Math.max(0, ...data[t].map(r => Number(r[PK[t]]) || 0)) + 1;
+const resultOf = exameId => data.RESULTADO_EXAME.find(r => String(r.EXAME_ID) === String(exameId));
+function badge(s){
+ const good = ['Realizada','Confirmada','Resultado disponível','Ativo'];
+ const warn = ['Aguardando coleta','Agendada','Agendado','Coletado'];
+ const bad = ['Não compareceu','Cancelada','Cancelado','Inativo'];
+ return `<span class="pill ${good.includes(s)?'good':bad.includes(s)?'bad':warn.includes(s)?'warn':''}">${esc(s)}</span>`;
+}
+let toastTimer;
+function notify(msg, bad){ const t = $('toast'); t.textContent = msg; t.className = 'toast show' + (bad ? ' bad' : ''); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.className = 'toast', bad ? 4200 : 2600); }
+function askConfirm(title, text, yesLabel){
+ return new Promise(res => {
+  $('confirmTitle').textContent = title; $('confirmText').textContent = text; $('confirmYes').textContent = yesLabel || 'Confirmar';
+  $('confirmModal').classList.add('open');
+  const done = v => { $('confirmModal').classList.remove('open'); $('confirmYes').onclick = $('confirmNo').onclick = null; res(v); };
+  $('confirmYes').onclick = () => done(true); $('confirmNo').onclick = () => done(false);
+ });
+}
+async function sha256(text){
+ try { const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)); return 'sha256:' + [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2,'0')).join(''); }
+ catch { return null; }
+}
+
+/* ===== Camada de banco de dados ===== */
+function normalize(t, row, docId){
+ const r = {}; COLUMNS[t].forEach(c => r[c] = row[c] ?? null);
+ if (r[PK[t]] == null) r[PK[t]] = t === 'PACIENTE' ? docId : Number(docId);
+ return r;
+}
+function loadLocal(){
+ let stored = null;
+ try { stored = JSON.parse(localStorage.getItem(LOCAL_KEY)); } catch {}
+ const src = stored && typeof stored === 'object' ? stored : JSON.parse(JSON.stringify(SEED));
+ TABLES.forEach(t => data[t] = Array.isArray(src[t]) ? src[t].map(r => normalize(t, r, r[PK[t]])) : []);
+}
+function persistLocal(){ try { localStorage.setItem(LOCAL_KEY, JSON.stringify(data)); } catch { notify('O navegador não deixou salvar os dados localmente.', true); } }
+function dbErrorMessage(e){
+ const code = e && e.code;
+ if (code === 'invalid_argument') { readOnly = true; return 'Você não tem permissão para alterar o banco. Peça ao dono do site acesso de Contribuidor ou Editor.'; }
+ if (code === 'quota_exceeded') return 'O banco de dados atingiu o limite de registros. Exclua registros antigos.';
+ if (code === 'resource_exhausted') return 'Muitas operações seguidas. Aguarde alguns segundos e tente de novo.';
+ if (code === 'revoked') return 'O acesso a este site foi alterado. Recarregue a página.';
+ return 'Não foi possível falar com o banco de dados agora. Tente de novo.';
+}
+async function writeRow(t, row){
+ const r = normalize(t, row, row[PK[t]]);
+ if (mode === 'cloud') {
+  const ref = cloud.collection(t).doc(String(r[PK[t]]));
+  try { await ref.set(r); }
+  catch (e) { if (e && e.code === 'unavailable') { await new Promise(s => setTimeout(s, 400 + Math.random()*600)); await ref.set(r); } else throw e; }
+ } else {
+  const i = data[t].findIndex(x => String(x[PK[t]]) === String(r[PK[t]]));
+  if (i >= 0) data[t][i] = r; else data[t].push(r);
+  persistLocal();
+ }
+}
+async function deleteRow(t, id){
+ if (mode === 'cloud') await cloud.collection(t).doc(String(id)).delete();
+ else { data[t] = data[t].filter(x => String(x[PK[t]]) !== String(id)); persistLocal(); }
+}
+let renderQueued = false;
+function scheduleRender(){ if (renderQueued) return; renderQueued = true; requestAnimationFrame(() => { renderQueued = false; render(); }); }
+
+async function init(){
+ route(); render();
+ let dbns = null;
+ try { if (window.claude && typeof window.claude.use === 'function') dbns = await window.claude.use('db'); } catch {}
+ if (!dbns) { mode = 'local'; loadLocal(); render(); return; }
+ cloud = dbns; mode = 'cloud';
+ try { userCap = await window.claude.use('user'); } catch {}
+ try { const w = userCap && await userCap.can('data.write'); if (w === false) readOnly = true; } catch {}
+ const pending = new Set(TABLES);
+ const timer = setTimeout(() => { if (pending.size) { connNote = 'lento'; scheduleRender(); } }, 10000);
+ TABLES.forEach(t => {
+  cloud.collection(t).onSnapshot(snap => {
+   data[t] = snap.docs.map(d => normalize(t, d.data() || {}, d.id));
+   if (!snap.metadata.fromCache && pending.delete(t) && !pending.size) { clearTimeout(timer); connNote = ''; }
+   scheduleRender();
+  }, err => {
+   pending.delete(t); if (!pending.size) clearTimeout(timer);
+   connNote = 'erro'; if (err && err.code === 'revoked') readOnly = true; scheduleRender();
+  });
+ });
+ render();
+}
+async function getDownloads(){
+ if (downloadsCap !== null) return downloadsCap || null;
+ try { downloadsCap = (window.claude && await window.claude.use('downloads')) || false; } catch { downloadsCap = false; }
+ return downloadsCap || null;
+}
+
+/* ===== Navegação ===== */
+const SECTIONS = [
+ ['Geral'],
+ ['inicio','◈','Visão geral'],
+ ['portal','☺','Área do paciente'],
+ ['Cadastros'],
+ ['pacientes','♙','Pacientes','PACIENTE'],
+ ['medicos','✚','Médicos','MEDICO'],
+ ['especialidades','❖','Especialidades','ESPECIALIDADE'],
+ ['Atendimento'],
+ ['consultas','▦','Consultas','CONSULTA'],
+ ['exames','▤','Exames','EXAME'],
+ ['acompanhamento','◷','Acompanhar exames'],
+ ['resultados','✓','Resultados','RESULTADO_EXAME'],
+ ['tipos','▥','Tipos de exame','TIPO_EXAME'],
+ ['laboratorios','⌂','Laboratórios','LABORATORIO'],
+ ['Sistema'],
+ ['usuarios','⚿','Usuários','USUARIO'],
+ ['banco','⛁','Banco de dados']
+];
+const PAGES = Object.fromEntries(SECTIONS.filter(s => s.length > 1).map(s => [s[0], {icon:s[1], title:s[2], table:s[3]}]));
+function route(){ const h = location.hash.replace('#',''); current = PAGES[h] ? h : 'inicio'; }
+function go(page){ if (location.hash !== '#' + page) location.hash = page; else { current = page; searchTerm = ''; render(); } }
+window.addEventListener('hashchange', () => { route(); searchTerm = ''; render(); window.scrollTo(0,0); });
+function navHtml(){
+ return SECTIONS.map(s => s.length === 1 ? `<div class="group">${s[0]}</div>` :
+  `<button class="${current===s[0]?'active':''}" onclick="go('${s[0]}')"><span class="ic">${s[1]}</span>${s[2]}</button>`).join('');
+}
+
+/* ===== Configuração das telas de cadastro ===== */
+const patientLabel = r => `${r.NOME} — ${fmtCPF(r.PACIENTE_CPF)}`;
+const doctorLabel = r => `${r.NOME} (${nameOf('ESPECIALIDADE', r.ESPECIALIDADE_ID)})`;
+const examLabel = r => `Exame #${r.EXAME_ID} · ${nameOf('TIPO_EXAME', r.TIPO_EXAME_ID)} · ${nameOf('PACIENTE', r.PACIENTE_CPF)}`;
+const CFG = {
+ PACIENTE:{sing:'paciente',fem:false,
+  fields:[
+   {k:'NOME',l:'Nome completo',type:'text',req:1,max:100},
+   {k:'PACIENTE_CPF',l:'CPF',type:'digits',len:[11],req:1,hint:'Somente números (11 dígitos). Não pode ser alterado depois.',lockOnEdit:1},
+   {k:'DATA_NASCIMENTO',l:'Data de nascimento',type:'date',req:1},
+   {k:'TELEFONE',l:'Telefone com DDD',type:'digits',len:[10,11],req:1},
+   {k:'EMAIL',l:'E-mail',type:'email',max:100},
+   {k:'ENDERECO',l:'Endereço',type:'text',req:1,max:200,wide:1}],
+  cols:[['Nome',r=>esc(r.NOME)],['CPF',r=>`<span class="mono">${fmtCPF(r.PACIENTE_CPF)}</span>`],['Nascimento',r=>fmtDate(r.DATA_NASCIMENTO)],['Telefone',r=>fmtPhone(r.TELEFONE)],['E-mail',r=>esc(r.EMAIL||'—')]]},
+ MEDICO:{sing:'médico',
+  fields:[
+   {k:'NOME',l:'Nome completo',type:'text',req:1,max:100},
+   {k:'CRM',l:'CRM/UF',type:'text',req:1,max:20,hint:'Ex.: 123456/SP'},
+   {k:'ESPECIALIDADE_ID',l:'Especialidade',type:'fk',ref:'ESPECIALIDADE',req:1},
+   {k:'TELEFONE',l:'Telefone com DDD',type:'digits',len:[10,11]}],
+  cols:[['Médico',r=>esc(r.NOME)],['CRM',r=>esc(r.CRM)],['Especialidade',r=>esc(nameOf('ESPECIALIDADE',r.ESPECIALIDADE_ID))],['Telefone',r=>fmtPhone(r.TELEFONE)]]},
+ ESPECIALIDADE:{sing:'especialidade',fem:true,
+  fields:[{k:'NOME',l:'Nome da especialidade',type:'text',req:1,max:60,wide:1}],
+  cols:[['Especialidade',r=>esc(r.NOME)],['Médicos',r=>data.MEDICO.filter(m=>String(m.ESPECIALIDADE_ID)===String(r.ESPECIALIDADE_ID)).length]]},
+ CONSULTA:{sing:'consulta',fem:true,
+  fields:[
+   {k:'PACIENTE_CPF',l:'Paciente',type:'fk',ref:'PACIENTE',req:1,label:patientLabel},
+   {k:'MEDICO_ID',l:'Médico',type:'fk',ref:'MEDICO',req:1,label:doctorLabel},
+   {k:'DATA_CONSULTA',l:'Data',type:'date',req:1},
+   {k:'HORA_CONSULTA',l:'Horário',type:'time',req:1},
+   {k:'ORIGEM',l:'Origem do agendamento',type:'enum',opts:['Presencial','On-line'],req:1},
+   {k:'SITUACAO',l:'Situação',type:'enum',opts:SIT_CONSULTA,req:1},
+   {k:'DATA_LEMBRETE',l:'Contato de lembrete (data e hora)',type:'datetime-local',hint:'Quando a recepção ligou para lembrar o paciente.'},
+   {k:'JUSTIFICATIVA_FALTA',l:'Justificativa da falta',type:'text',max:200,hint:'Somente se a situação for "Não compareceu".'}],
+  cols:[['Paciente',r=>esc(nameOf('PACIENTE',r.PACIENTE_CPF))],['Médico',r=>esc(nameOf('MEDICO',r.MEDICO_ID))],['Data e hora',r=>fmtDate(r.DATA_CONSULTA)+' '+esc(r.HORA_CONSULTA||'')],['Origem',r=>esc(r.ORIGEM)],['Lembrete',r=>r.DATA_LEMBRETE?fmtDT(r.DATA_LEMBRETE):'<span class="muted">Pendente</span>'],['Situação',r=>badge(r.SITUACAO)]],
+  sort:(a,b)=>(b.DATA_CONSULTA+b.HORA_CONSULTA).localeCompare(a.DATA_CONSULTA+a.HORA_CONSULTA)},
+ EXAME:{sing:'exame',
+  fields:[
+   {k:'PACIENTE_CPF',l:'Paciente',type:'fk',ref:'PACIENTE',req:1,label:patientLabel},
+   {k:'TIPO_EXAME_ID',l:'Tipo de exame',type:'fk',ref:'TIPO_EXAME',req:1,label:r=>`${r.NOME}${Number(r.EXIGE_PEDIDO_MEDICO)===1?' (exige pedido)':''}`},
+   {k:'ORIGEM',l:'Origem do agendamento',type:'enum',opts:['Presencial','On-line'],req:1},
+   {k:'PEDIDO_MEDICO_APRESENTADO',l:'Pedido médico apresentado?',type:'bool',req:1},
+   {k:'DATA_AGENDADA',l:'Data agendada para coleta',type:'date',req:1},
+   {k:'DATA_COLETA',l:'Data da coleta',type:'date'},
+   {k:'DATA_ENCAMINHAMENTO',l:'Data do encaminhamento ao laboratório',type:'date'},
+   {k:'LABORATORIO_ID',l:'Laboratório parceiro',type:'fk',ref:'LABORATORIO',hint:'Definido no momento do encaminhamento.'},
+   {k:'PREVISAO_ENTREGA',l:'Previsão de entrega do resultado',type:'date'},
+   {k:'SITUACAO',l:'Situação',type:'enum',opts:SIT_EXAME,req:1,hint:'"Resultado disponível" é marcado sozinho ao registrar o resultado.'}],
+  cols:[['Nº',r=>'#'+r.EXAME_ID],['Paciente',r=>esc(nameOf('PACIENTE',r.PACIENTE_CPF))],['Exame',r=>esc(nameOf('TIPO_EXAME',r.TIPO_EXAME_ID))],['Agendado',r=>fmtDate(r.DATA_AGENDADA)],['Laboratório',r=>esc(r.LABORATORIO_ID?nameOf('LABORATORIO',r.LABORATORIO_ID):'A definir')],['Situação',r=>badge(r.SITUACAO)]],
+  sort:(a,b)=>Number(b.EXAME_ID)-Number(a.EXAME_ID)},
+ RESULTADO_EXAME:{sing:'resultado',
+  fields:[
+   {k:'EXAME_ID',l:'Exame',type:'fk',ref:'EXAME',req:1,label:examLabel,lockOnEdit:1,filter:(r,ed)=>(ed&&String(ed.EXAME_ID)===String(r.EXAME_ID))||(!resultOf(r.EXAME_ID)&&['Enviado ao laboratório','Em análise'].includes(r.SITUACAO)),hint:'Só aparecem exames enviados ao laboratório ou em análise.'},
+   {k:'DATA_LIBERACAO',l:'Data e hora da liberação',type:'datetime-local',req:1,def:()=>nowLocal()},
+   {k:'ARQUIVO_PDF',l:'Arquivo PDF do resultado',type:'text',req:1,max:255,hint:'Nome do arquivo, ex.: resultado_exame_7.pdf'},
+   {k:'OBSERVACAO',l:'Observação (não inserir dados médicos reais)',type:'textarea',max:300,wide:1}],
+  cols:[['Exame',r=>{const e=find('EXAME',r.EXAME_ID);return e?`#${e.EXAME_ID} · ${esc(nameOf('TIPO_EXAME',e.TIPO_EXAME_ID))}`:'—'}],['Paciente',r=>esc(nameOf('PACIENTE',find('EXAME',r.EXAME_ID)?.PACIENTE_CPF))],['Liberado em',r=>fmtDT(r.DATA_LIBERACAO)],['Arquivo',r=>`<span class="mono">${esc(r.ARQUIVO_PDF)}</span>`]],
+  sort:(a,b)=>String(b.DATA_LIBERACAO).localeCompare(String(a.DATA_LIBERACAO))},
+ TIPO_EXAME:{sing:'tipo de exame',
+  fields:[{k:'NOME',l:'Nome do exame',type:'text',req:1,max:100},{k:'EXIGE_PEDIDO_MEDICO',l:'Exige pedido médico?',type:'bool',req:1,def:()=>1}],
+  cols:[['Tipo de exame',r=>esc(r.NOME)],['Exige pedido',r=>yesNo(r.EXIGE_PEDIDO_MEDICO)]]},
+ LABORATORIO:{sing:'laboratório',
+  fields:[{k:'NOME',l:'Nome do laboratório',type:'text',req:1,max:100},{k:'CNPJ',l:'CNPJ',type:'digits',len:[14],hint:'Somente números (14 dígitos).'},{k:'TELEFONE',l:'Telefone com DDD',type:'digits',len:[10,11]},{k:'EMAIL',l:'E-mail',type:'email',max:100}],
+  cols:[['Laboratório',r=>esc(r.NOME)],['CNPJ',r=>`<span class="mono">${fmtCNPJ(r.CNPJ)}</span>`],['Telefone',r=>fmtPhone(r.TELEFONE)],['E-mail',r=>esc(r.EMAIL||'—')]]},
+ USUARIO:{sing:'usuário',
+  fields:[
+   {k:'EMAIL',l:'E-mail de acesso',type:'email',req:1,max:100},
+   {k:'PERFIL',l:'Perfil',type:'enum',opts:['Paciente','Recepção','Administrador'],req:1},
+   {k:'PACIENTE_CPF',l:'Paciente vinculado',type:'fk',ref:'PACIENTE',label:patientLabel,hint:'Obrigatório só para o perfil Paciente.'},
+   {k:'ATIVO',l:'Conta ativa?',type:'bool',req:1,def:()=>1},
+   {k:'SENHA',l:'Senha',type:'password',hint:'Guardada só como hash SHA-256 (coluna SENHA_HASH). Na edição, deixe em branco para manter.',wide:1}],
+  cols:[['E-mail',r=>esc(r.EMAIL)],['Perfil',r=>esc(r.PERFIL)],['Paciente',r=>esc(r.PACIENTE_CPF?nameOf('PACIENTE',r.PACIENTE_CPF):'—')],['Ativo',r=>badge(Number(r.ATIVO)===1?'Ativo':'Inativo')],['Criado em',r=>fmtDT(r.DATA_CADASTRO)]]}
+};
+
+/* ===== Telas ===== */
+function table(head, rows){
+ const body = rows.length ? rows.map(cells => '<tr>' + cells.map((c,i) => `<td data-label="${esc(head[i])}">${c}</td>`).join('') + '</tr>').join('')
+  : `<tr><td colspan="${head.length}" class="empty">Nenhum registro encontrado.</td></tr>`;
+ return `<div class="tablewrap"><table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+function loadingView(){ return `<div class="panel"><p class="muted">Carregando dados do banco…</p></div>`; }
+
+function dashboard(){
+ const t = today(), amanha = addDays(t, 1);
+ const abertas = data.CONSULTA.filter(c => ['Agendada','Confirmada'].includes(c.SITUACAO));
+ const exAndamento = data.EXAME.filter(e => !['Resultado disponível','Cancelado'].includes(e.SITUACAO));
+ const proximas = abertas.filter(c => c.DATA_CONSULTA >= t).sort((a,b)=>(a.DATA_CONSULTA+a.HORA_CONSULTA).localeCompare(b.DATA_CONSULTA+b.HORA_CONSULTA)).slice(0,6);
+ const lembretes = abertas.filter(c => c.DATA_CONSULTA >= t && c.DATA_CONSULTA <= amanha && !c.DATA_LEMBRETE).sort((a,b)=>(a.DATA_CONSULTA+a.HORA_CONSULTA).localeCompare(b.DATA_CONSULTA+b.HORA_CONSULTA));
+ return `
+ <div class="hero"><div><h2>Bem-vindo à Clínica Adolfo Lutz</h2><p>Cadastre pacientes e médicos, organize as consultas, acompanhe os exames enviados aos laboratórios parceiros e libere os resultados para os pacientes.</p></div><div class="heroimg"><img src="${document.querySelector('.logo-card img').src}" alt=""></div></div>
+ <div class="stats">
+  <div class="stat"><span>Pacientes</span><strong>${data.PACIENTE.length}</strong><em>Cadastros únicos por CPF</em></div>
+  <div class="stat"><span>Médicos</span><strong>${data.MEDICO.length}</strong><em>${data.ESPECIALIDADE.length} especialidade(s)</em></div>
+  <div class="stat"><span>Consultas em aberto</span><strong>${abertas.length}</strong><em>Agendadas ou confirmadas</em></div>
+  <div class="stat"><span>Exames em andamento</span><strong>${exAndamento.length}</strong><em>Ainda sem resultado</em></div>
+  <div class="stat"><span>Resultados liberados</span><strong>${data.RESULTADO_EXAME.length}</strong><em>Disponíveis ao paciente</em></div>
+ </div>
+ <div class="grid2">
+  <div class="panel"><div class="panelhead"><h2>Próximas consultas</h2><button class="secondary" onclick="go('consultas')">Ver todas</button></div>
+   ${table(['Paciente','Médico','Data e hora','Situação'], proximas.map(c=>[esc(nameOf('PACIENTE',c.PACIENTE_CPF)),esc(nameOf('MEDICO',c.MEDICO_ID)),fmtDate(c.DATA_CONSULTA)+' '+esc(c.HORA_CONSULTA),badge(c.SITUACAO)]))}</div>
+  <div class="panel"><div class="panelhead"><div><h2>Lembretes a fazer</h2><p class="muted" style="margin:4px 0 0">Consultas de hoje e amanhã sem contato registrado</p></div></div>
+   ${lembretes.length ? lembretes.map(c=>{const p=find('PACIENTE',c.PACIENTE_CPF);return `<div class="reminder"><div><strong>${esc(p?.NOME||'—')}</strong><div class="muted">${fmtDate(c.DATA_CONSULTA)} às ${esc(c.HORA_CONSULTA)} · ${esc(nameOf('MEDICO',c.MEDICO_ID))} · ${fmtPhone(p?.TELEFONE)}</div></div><button class="primary" onclick="registerReminder(${c.CONSULTA_ID})">Registrar contato</button></div>`}).join('') : '<p class="empty">Nenhum lembrete pendente. ✓</p>'}</div>
+ </div>
+ <div class="panel"><div class="panelhead"><h2>Exames em andamento</h2><button class="secondary" onclick="go('acompanhamento')">Acompanhar</button></div>
+  ${table(['Nº','Paciente','Exame','Laboratório','Previsão','Situação'], exAndamento.sort((a,b)=>Number(b.EXAME_ID)-Number(a.EXAME_ID)).slice(0,6).map(e=>['#'+e.EXAME_ID,esc(nameOf('PACIENTE',e.PACIENTE_CPF)),esc(nameOf('TIPO_EXAME',e.TIPO_EXAME_ID)),esc(e.LABORATORIO_ID?nameOf('LABORATORIO',e.LABORATORIO_ID):'A definir'),fmtDate(e.PREVISAO_ENTREGA),badge(e.SITUACAO)]))}</div>
+ <div class="notice">Trabalho acadêmico: este sistema não realiza atendimentos reais, não envia mensagens e não se conecta a laboratórios. Use somente dados fictícios.</div>`;
+}
+
+function listing(t){
+ const cfg = CFG[t], q = searchTerm.trim().toLowerCase();
+ let rows = data[t].slice();
+ if (cfg.sort) rows.sort(cfg.sort);
+ const cells = rows.map(r => [...cfg.cols.map(c => c[1](r)), rowActions(t, r[PK[t]])]);
+ const filtered = q ? cells.filter(c => c.slice(0,-1).join(' ').replace(/<[^>]+>/g,' ').toLowerCase().includes(q)) : cells;
+ const novo = (cfg.fem ? 'Nova ' : 'Novo ') + cfg.sing;
+ let extra = '';
+ if (t === 'RESULTADO_EXAME') extra = '<div class="notice info">Ao registrar um resultado, a situação do exame muda sozinha para "Resultado disponível". O PDF é representado pelo nome do arquivo: o site não guarda arquivos e não recebe resultados de laboratórios.</div>';
+ if (t === 'USUARIO') extra = '<div class="notice info">A senha nunca é guardada em texto puro: o banco recebe apenas o hash (coluna SENHA_HASH). Em um sistema real usaríamos um algoritmo próprio para senhas, como bcrypt, no servidor.</div>';
+ if (t === 'EXAME') extra = '<div class="notice info">Regras aplicadas: a coleta exige o pedido médico quando o tipo de exame pede; o encaminhamento exige o laboratório e não pode ser anterior à coleta.</div>';
+ return `<div class="panel"><div class="panelhead"><div><h2>${PAGES[current].title}</h2><p class="muted" style="margin:4px 0 0">${data[t].length} registro(s) na tabela <span class="mono">${t}</span></p></div>
+  <button class="primary" onclick="openForm('${t}')" ${readOnly?'disabled':''}>+ ${novo}</button></div>
+  <div style="margin-bottom:16px"><input class="search" id="search" placeholder="Pesquisar…" value="${esc(searchTerm)}" oninput="searchTerm=this.value;render()"></div>
+  ${table([...cfg.cols.map(c=>c[0]),'Ações'], filtered)}</div>${extra}`;
+}
+function rowActions(t, id){
+ const sid = esc(JSON.stringify(String(id)));
+ const pdf = t === 'RESULTADO_EXAME' ? `<button class="primary" onclick="baixarLaudo(${Number(find(t,id)?.EXAME_ID)})">📄 PDF</button>` : '';
+ if (readOnly) return pdf ? `<div class="actions">${pdf}</div>` : '<span class="muted">Somente leitura</span>';
+ return `<div class="actions">${pdf}<button class="secondary" onclick="openForm('${t}',${sid})">Editar</button><button class="danger" onclick="removeRow('${t}',${sid})">Excluir</button></div>`;
+}
+
+/* ===== Laudo em PDF (fictício, para demonstração) ===== */
+let LOGO_JPG = ''; const LOGO_W = 360, LOGO_H = 295;
+function prepLogoJpg(){ const im = new Image(); im.onload = () => { try { const cv = document.createElement('canvas'); cv.width = LOGO_W; cv.height = LOGO_H; const g = cv.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, LOGO_W, LOGO_H); g.drawImage(im, 0, 0, LOGO_W, LOGO_H); LOGO_JPG = cv.toDataURL('image/jpeg', 0.9).split(',')[1]; } catch {} }; const el = document.querySelector('.logo-card img'); if (el) im.src = el.src; }
+window.addEventListener('load', prepLogoJpg);
+function seededRand(seed){ let s = (seed * 2654435761) % 4294967296; return () => { s = (s * 1664525 + 1013904223) % 4294967296; return s / 4294967296; }; }
+function analitos(tipoNome, exameId){
+ const r = seededRand(exameId + 7); const n = (a, b, d = 0) => (a + r() * (b - a)).toFixed(d).replace('.', ',');
+ const t = (tipoNome || '').toLowerCase();
+ if (t.includes('hemograma')) return [
+  ['Hemácias', n(4.6, 5.6, 2), 'milhões/µL', '4,50 a 5,90'], ['Hemoglobina', n(13.8, 16.5, 1), 'g/dL', '13,5 a 17,5'],
+  ['Hematócrito', n(41, 49, 1), '%', '41,0 a 53,0'], ['Leucócitos', String(Math.round(5000 + r() * 4500)), '/mm³', '4.000 a 11.000'],
+  ['Plaquetas', String(Math.round(180 + r() * 220)), 'mil/mm³', '150 a 450']];
+ if (t.includes('glicemia') || t.includes('glicose')) return [['Glicose em jejum', n(74, 96), 'mg/dL', '70 a 99']];
+ if (t.includes('colesterol')) return [
+  ['Colesterol total', n(150, 185), 'mg/dL', 'menor que 190'], ['HDL colesterol', n(45, 65), 'mg/dL', 'maior que 40'],
+  ['LDL colesterol', n(80, 125), 'mg/dL', 'menor que 130'], ['Triglicerídeos', n(70, 140), 'mg/dL', 'menor que 150']];
+ if (t.includes('urina') || t.includes('eas')) return [
+  ['Cor', 'Amarelo citrino', '', 'Amarelo citrino'], ['Aspecto', 'Límpido', '', 'Límpido'], ['Densidade', n(1.010, 1.025, 3), '', '1,005 a 1,030'],
+  ['pH', n(5.5, 6.5, 1), '', '5,0 a 7,0'], ['Proteínas', 'Negativo', '', 'Negativo'], ['Glicose', 'Negativo', '', 'Negativo'], ['Leucócitos', String(Math.round(1 + r() * 3)), '/campo', 'até 5']];
+ return [['Resultado', 'Dentro da normalidade', '', '—']];
+}
+function pdfText(s){ // texto -> bytes WinAnsi escapados para PDF
+ const map = {'–':0x96,'—':0x97,'•':0x95,'“':0x93,'”':0x94,'‘':0x91,'’':0x92,'…':0x85};
+ let o = '';
+ for (const ch of String(s)) { let c = map[ch] ?? ch.charCodeAt(0); if (c > 255) c = 63; const x = String.fromCharCode(c); o += (x === '(' || x === ')' || x === '\\') ? '\\' + x : x; }
+ return o;
+}
+function gerarLaudoPdf(exameId){
+ const e = find('EXAME', exameId), res = resultOf(exameId); if (!e || !res) return null;
+ const p = find('PACIENTE', e.PACIENTE_CPF) || {}, tipo = nameOf('TIPO_EXAME', e.TIPO_EXAME_ID);
+ const lab = e.LABORATORIO_ID ? nameOf('LABORATORIO', e.LABORATORIO_ID) : '—';
+ const W = 595, H = 842, M = 42; const c = [];
+ const txt = (x, y, s, size = 10, bold = false, rgb = '0.09 0.2 0.29') => c.push(`BT ${rgb} rg /${bold ? 'F2' : 'F1'} ${size} Tf ${x} ${y} Td (${pdfText(s)}) Tj ET`);
+ const rect = (x, y, w, h, rgb) => c.push(`${rgb} rg ${x} ${y} ${w} ${h} re f`);
+ const line = (x1, y1, x2, y2, rgb = '0.85 0.89 0.92', wd = 0.8) => c.push(`${rgb} RG ${wd} w ${x1} ${y1} m ${x2} ${y2} l S`);
+ // cabeçalho
+ const lw = 92, lh = Math.round(lw * LOGO_H / LOGO_W);
+ c.push(`q ${lw} 0 0 ${lh} ${M} ${H - 52 - lh} cm /Im1 Do Q`);
+ txt(M + lw + 16, H - 78, 'CLÍNICA MÉDICA ADOLFO LUTZ', 17, true);
+ txt(M + lw + 16, H - 96, 'Tradição na ciência, excelência no cuidado.', 10, false, '0.38 0.46 0.53');
+ txt(M + lw + 16, H - 118, 'LAUDO DE EXAME LABORATORIAL', 12, true, '0.11 0.55 0.53');
+ let y = H - 52 - lh - 14;
+ rect(M, y, W - 2 * M, 2, '0.11 0.55 0.53');
+ // dados
+ y -= 24;
+ const campos = [
+  ['Paciente', p.NOME || '—'], ['CPF', fmtCPF(e.PACIENTE_CPF)], ['Data de nascimento', fmtDate(p.DATA_NASCIMENTO)],
+  ['Exame', `Nº ${e.EXAME_ID} – ${tipo}`], ['Laboratório parceiro', lab], ['Data da coleta', fmtDate(e.DATA_COLETA)],
+  ['Encaminhado em', fmtDate(e.DATA_ENCAMINHAMENTO)], ['Liberado em', fmtDT(res.DATA_LIBERACAO)], ['Arquivo', res.ARQUIVO_PDF]];
+ campos.forEach(([k, v], i) => { const col = i % 2, row = Math.floor(i / 2); const x = M + col * 262, yy = y - row * 30;
+  txt(x, yy, k.toUpperCase(), 7.5, true, '0.38 0.46 0.53'); txt(x, yy - 12, v, 10.5, false); });
+ y -= Math.ceil(campos.length / 2) * 30 + 14;
+ // tabela
+ rect(M, y - 6, W - 2 * M, 22, '0.06 0.21 0.34');
+ const X = [M + 10, M + 190, M + 300, M + 380];
+ ['ANALITO', 'RESULTADO', 'UNIDADE', 'VALORES DE REFERÊNCIA'].forEach((h, i) => txt(X[i], y + 1, h, 8.5, true, '1 1 1'));
+ y -= 26;
+ analitos(tipo, Number(e.EXAME_ID)).forEach((a, i) => {
+  if (i % 2 === 0) rect(M, y - 7, W - 2 * M, 22, '0.95 0.97 0.98');
+  txt(X[0], y, a[0], 10); txt(X[1], y, a[1], 10, true); txt(X[2], y, a[2], 9.5, false, '0.38 0.46 0.53'); txt(X[3], y, a[3], 9.5, false, '0.38 0.46 0.53');
+  y -= 22; });
+ line(M, y + 12, W - M, y + 12);
+ y -= 14;
+ if (res.OBSERVACAO) { txt(M, y, 'Observação:', 9.5, true); txt(M + 64, y, res.OBSERVACAO, 9.5); y -= 18; }
+ // rodapé
+ line(M, 66, W - M, 66);
+ txt(M, 52, 'Gerado em ' + fmtDT(nowLocal()) + ' pelo sistema acadêmico da Clínica Médica Adolfo Lutz. Sem validade médica.', 7.5, false, '0.55 0.6 0.65');
+ const stream = c.join('\n');
+ const img = atob(LOGO_JPG);
+ const objs = [
+  '<< /Type /Catalog /Pages 2 0 R >>',
+  '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+  `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 4 0 R /F2 5 0 R >> /XObject << /Im1 6 0 R >> >> /Contents 7 0 R >>`,
+  '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
+  '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
+  `<< /Type /XObject /Subtype /Image /Width ${LOGO_W} /Height ${LOGO_H} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${img.length} >>\nstream\n${img}\nendstream`,
+  `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
+  `<< /Title (${pdfText('Laudo ' + res.ARQUIVO_PDF)}) /Producer (${pdfText('Sistema Clinica Adolfo Lutz - academico')}) >>`];
+ let out = '%PDF-1.4\n%\xe2\xe3\xcf\xd3\n'; const off = [];
+ objs.forEach((o, i) => { off.push(out.length); out += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+ const xref = out.length;
+ out += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n` + off.map(o => String(o).padStart(10, '0') + ' 00000 n \n').join('');
+ out += `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R /Info 8 0 R >>\nstartxref\n${xref}\n%%EOF`;
+ const bytes = new Uint8Array(out.length); for (let i = 0; i < out.length; i++) bytes[i] = out.charCodeAt(i) & 255;
+ return { bytes, nome: /\.pdf$/i.test(res.ARQUIVO_PDF) ? res.ARQUIVO_PDF : res.ARQUIVO_PDF + '.pdf' };
+}
+async function baixarLaudo(exameId){
+ const pdf = gerarLaudoPdf(exameId);
+ if (!pdf) { notify('Este exame ainda não tem resultado liberado.', true); return; }
+ await offerFile(pdf.nome, new Blob([pdf.bytes], {type: 'application/pdf'}));
+}
+
+/* ===== Acompanhamento de exames ===== */
+const STAGE = {'Agendado':0,'Aguardando coleta':0,'Coletado':1,'Enviado ao laboratório':2,'Em análise':3,'Resultado disponível':4};
+const isLate = e => !resultOf(e.EXAME_ID) && e.SITUACAO !== 'Cancelado' && e.PREVISAO_ENTREGA && e.PREVISAO_ENTREGA < today();
+function trackGroup(e){
+ if (e.SITUACAO === 'Cancelado') return 'cancelados';
+ if (resultOf(e.EXAME_ID)) return 'prontos';
+ return (STAGE[e.SITUACAO] ?? 0) <= 1 ? 'coleta' : 'laboratorio';
+}
+function trackCard(e, admin){
+ const res = resultOf(e.EXAME_ID), p = find('PACIENTE', e.PACIENTE_CPF), cancel = e.SITUACAO === 'Cancelado';
+ const st = res ? 4 : (STAGE[e.SITUACAO] ?? 0), late = isLate(e);
+ const lab = e.LABORATORIO_ID ? nameOf('LABORATORIO', e.LABORATORIO_ID) : '';
+ const steps = [
+  ['Agendado', fmtDate(e.DATA_AGENDADA) + (e.SITUACAO === 'Aguardando coleta' ? '<br>Aguardando coleta' : '')],
+  ['Coleta', e.DATA_COLETA ? fmtDate(e.DATA_COLETA) : 'Pendente'],
+  ['Enviado ao laboratório', e.DATA_ENCAMINHAMENTO ? fmtDate(e.DATA_ENCAMINHAMENTO) + '<br>' + esc(lab) : 'Pendente'],
+  ['Em análise', e.PREVISAO_ENTREGA ? 'Previsão ' + fmtDate(e.PREVISAO_ENTREGA) : (st >= 3 ? 'Sem previsão' : 'Pendente')],
+  ['Resultado liberado', res ? fmtDT(res.DATA_LIBERACAO) : 'Pendente']
+ ];
+ const html = steps.map(([t, d], i) => {
+  const cls = cancel ? 'todo' : i < st || (i === 4 && res) ? 'done' : i === st ? 'now' : 'todo';
+  return `<div class="step ${cls}"><span class="dot">${cls === 'done' ? '✓' : i + 1}</span><div><b>${t}</b><small>${cls === 'todo' && !cancel && i > st ? 'Pendente' : d}</small></div></div>`;
+ }).join('');
+ const pedidoTxt = Number(find('TIPO_EXAME', e.TIPO_EXAME_ID)?.EXIGE_PEDIDO_MEDICO) === 1 ? (Number(e.PEDIDO_MEDICO_APRESENTADO) === 1 ? 'Pedido médico apresentado' : '⚠ Falta o pedido médico') : 'Não exige pedido médico';
+ let acts = '';
+ if (admin && !readOnly) {
+  acts = `<div class="actions"><button class="secondary" onclick="openForm('EXAME',${e.EXAME_ID})">Atualizar etapa</button>`;
+  if (!res && ['Enviado ao laboratório','Em análise'].includes(e.SITUACAO)) acts += `<button class="primary" onclick="openForm('RESULTADO_EXAME',null,{EXAME_ID:${e.EXAME_ID}})">Registrar resultado</button>`;
+  acts += '</div>';
+ }
+ if (res) acts = `<div class="actions"><button class="primary" onclick="baixarLaudo(${e.EXAME_ID})">📄 Baixar laudo (PDF)</button>${acts.replace('<div class="actions">', '').replace(/<\/div>$/, '')}</div>`;
+ const foot = res ? `📄 <span class="mono">${esc(res.ARQUIVO_PDF)}</span>${res.OBSERVACAO ? ' · ' + esc(res.OBSERVACAO) : ''}` : esc(pedidoTxt) + ' · Origem: ' + esc(e.ORIGEM);
+ return `<div class="tcard ${late ? 'late' : ''}">
+  <div class="thead"><div><h3>Exame #${e.EXAME_ID} · ${esc(nameOf('TIPO_EXAME', e.TIPO_EXAME_ID))}</h3><p>${admin ? esc(p?.NOME || '—') + ' · CPF ' + fmtCPF(e.PACIENTE_CPF) : 'Agendado para ' + fmtDate(e.DATA_AGENDADA)}</p></div>
+  <div class="actions">${late ? '<span class="pill bad">Resultado atrasado</span>' : ''}${badge(res ? 'Resultado disponível' : e.SITUACAO)}</div></div>
+  ${cancel ? '<div class="cancel">Exame cancelado.</div>' : `<div class="steps">${html}</div>`}
+  <div class="tfoot"><span>${foot}</span>${acts}</div></div>`;
+}
+function acompanhamento(){
+ const q = searchTerm.trim().toLowerCase(), qd = digits(q);
+ const all = data.EXAME.slice().sort((a,b) => (isLate(b) - isLate(a)) || ((STAGE[a.SITUACAO] ?? 9) - (STAGE[b.SITUACAO] ?? 9)) || String(a.DATA_AGENDADA).localeCompare(String(b.DATA_AGENDADA)));
+ const groups = [['todos','Todos',()=>true],['coleta','Aguardando coleta',e=>trackGroup(e)==='coleta'],['laboratorio','No laboratório',e=>trackGroup(e)==='laboratorio'],['atrasados','Atrasados',isLate],['prontos','Com resultado',e=>trackGroup(e)==='prontos'],['cancelados','Cancelados',e=>trackGroup(e)==='cancelados']];
+ const fn = (groups.find(g => g[0] === trackFilter) || groups[0])[2];
+ const list = all.filter(fn).filter(e => {
+  if (!q) return true;
+  const p = find('PACIENTE', e.PACIENTE_CPF);
+  return (p?.NOME || '').toLowerCase().includes(q) || nameOf('TIPO_EXAME', e.TIPO_EXAME_ID).toLowerCase().includes(q) || (qd && (e.PACIENTE_CPF.includes(qd) || String(e.EXAME_ID) === qd));
+ });
+ return `<div class="panel"><div class="panelhead"><div><h2>Acompanhar exames</h2><p class="muted" style="margin:4px 0 0">Do agendamento até a liberação do resultado</p></div>
+  <input class="search" id="search" placeholder="Paciente, CPF, nº ou tipo de exame…" value="${esc(searchTerm)}" oninput="searchTerm=this.value;render()"></div>
+  <div class="chips">${groups.map(g => `<button class="chip ${trackFilter===g[0]?'on':''}" onclick="trackFilter='${g[0]}';render()">${g[1]}<span>${all.filter(g[2]).length}</span></button>`).join('')}</div></div>
+  <div class="track">${list.length ? list.map(e => trackCard(e, true)).join('') : '<div class="panel empty">Nenhum exame encontrado.</div>'}</div>`;
+}
+
+function portal(){
+ if (!patientSession) {
+  return `<div class="panel login"><h2>Área do paciente</h2><p class="muted" style="line-height:1.6">Entre com o e-mail e a senha do usuário para ver suas consultas, exames e resultados.</p>
+   <form id="loginForm" onsubmit="doLogin(event)"><div class="field" style="margin-top:12px"><label>E-mail</label><input name="email" type="email" required autocomplete="username"></div>
+   <div class="field" style="margin-top:12px"><label>Senha</label><input name="senha" type="password" required autocomplete="current-password"></div>
+   <div class="formactions"><button class="primary" type="submit" style="width:100%">Entrar</button></div></form>
+   <div class="notice info">Para testar: <b>maria@exemplo.test</b> / senha <b>paciente123</b>.<br>Demonstração: o login confere o hash da senha guardado no banco, mas não é um sistema de segurança real.</div></div>`;
+ }
+ const u = find('USUARIO', patientSession);
+ const p = u && find('PACIENTE', u.PACIENTE_CPF);
+ if (!u || !p || Number(u.ATIVO) !== 1) { patientSession = null; return portal(); }
+ const cons = data.CONSULTA.filter(c => c.PACIENTE_CPF === p.PACIENTE_CPF).sort((a,b)=>(b.DATA_CONSULTA+b.HORA_CONSULTA).localeCompare(a.DATA_CONSULTA+a.HORA_CONSULTA));
+ const exs = data.EXAME.filter(e => e.PACIENTE_CPF === p.PACIENTE_CPF).sort((a,b)=>Number(b.EXAME_ID)-Number(a.EXAME_ID));
+ return `<div class="panel"><div class="panelhead"><div><h2>Olá, ${esc(p.NOME.split(' ')[0])}!</h2><p class="muted" style="margin:4px 0 0">${esc(p.NOME)} · CPF ${fmtCPF(p.PACIENTE_CPF)}</p></div><button class="secondary" onclick="patientSession=null;render()">Sair</button></div></div>
+  <div class="panel"><h2 style="margin-bottom:14px">Minhas consultas</h2>${table(['Data e hora','Médico','Especialidade','Situação'], cons.map(c=>{const m=find('MEDICO',c.MEDICO_ID);return [fmtDate(c.DATA_CONSULTA)+' '+esc(c.HORA_CONSULTA),esc(m?.NOME||'—'),esc(m?nameOf('ESPECIALIDADE',m.ESPECIALIDADE_ID):'—'),badge(c.SITUACAO)]}))}</div>
+  <div class="panel" style="margin-bottom:14px"><h2>Acompanhe seus exames</h2><p class="muted" style="margin:4px 0 0">Veja em que etapa está cada exame e quando o resultado for liberado.</p></div>
+  <div class="track">${exs.length ? exs.map(e => trackCard(e, false)).join('') : '<div class="panel empty">Você ainda não tem exames.</div>'}</div>`;
+}
+async function doLogin(ev){
+ ev.preventDefault();
+ const f = new FormData(ev.target);
+ const email = String(f.get('email')||'').trim().toLowerCase();
+ const hash = await sha256(String(f.get('senha')||''));
+ const u = data.USUARIO.find(x => String(x.EMAIL).toLowerCase() === email);
+ if (!u || !hash || u.SENHA_HASH !== hash) { notify('E-mail ou senha incorretos.', true); return; }
+ if (Number(u.ATIVO) !== 1) { notify('Esta conta está inativa. Procure a recepção.', true); return; }
+ if (u.PERFIL !== 'Paciente') { notify(`Login de ${u.PERFIL} confirmado. Use o menu lateral para a área administrativa.`); return; }
+ patientSession = u.USUARIO_ID; render();
+}
+
+function banco(){
+ const st = mode === 'cloud'
+  ? (connNote === 'erro' ? '<span class="pill bad">Erro de conexão</span>' : connNote === 'lento' ? '<span class="pill warn">Conexão lenta</span>' : '<span class="pill good">On-line e compartilhado</span>')
+  : '<span class="pill warn">Modo local (só neste navegador)</span>';
+ const how = mode === 'cloud'
+  ? 'Os dados ficam no banco de dados do site, na nuvem. Todos do grupo que abrirem este link veem as mesmas informações, e as alterações aparecem na hora para todos.'
+  : 'O site não está conectado ao banco na nuvem (por exemplo, quando o arquivo é aberto direto do computador). Os dados ficam guardados apenas neste navegador.';
+ return `<div class="panel"><div class="panelhead"><div><h2>Banco de dados</h2><p class="muted" style="margin:4px 0 0">Mesmas 9 tabelas e colunas do dicionário de dados</p></div>${st}</div>
+  <p style="line-height:1.6;margin:0 0 16px">${how}</p>
+  <div class="dbtable">${TABLES.map(t=>`<div><b>${t}</b><span>${data[t].length} registro(s)</span></div>`).join('')}</div>
+  ${readOnly ? '<div class="notice">Você está em modo somente leitura. Para cadastrar e editar, o dono do site precisa compartilhar com você como Contribuidor ou Editor.</div>' : ''}</div>
+ <div class="grid2">
+  <div class="panel"><h3>Exportar para planilha (Excel)</h3><p class="muted" style="line-height:1.6">Gera um arquivo .xlsx com uma aba por tabela, com os nomes de colunas do dicionário de dados.</p><button class="primary" id="btnXlsx" onclick="exportXlsx()">⬇ Baixar planilha .xlsx</button></div>
+  <div class="panel"><h3>Exportar para o MySQL</h3><p class="muted" style="line-height:1.6">Gera um arquivo com os comandos INSERT de todos os registros, prontos para rodar depois do script do modelo físico.</p><button class="primary" onclick="exportSql()">⬇ Baixar inserts .sql</button></div>
+ </div>
+ ${mode === 'local' ? `<div class="panel"><h3>Dados de exemplo</h3><p class="muted">Apaga as alterações feitas neste navegador e volta aos dados fictícios iniciais.</p><button class="danger" onclick="resetLocal()">Restaurar dados de exemplo</button></div>` : ''}`;
+}
+
+/* ===== Render ===== */
+function render(){
+ $('nav').innerHTML = navHtml();
+ const page = PAGES[current];
+ $('pageTitle').textContent = page.title;
+ const s = $('status');
+ s.className = 'status ' + (mode === 'cloud' ? (connNote === 'erro' ? 'err' : 'cloud') : mode === 'local' ? 'local' : '');
+ s.querySelector('span').textContent = mode === 'cloud' ? (connNote === 'erro' ? 'Erro no banco' : connNote === 'lento' ? 'Banco lento…' : 'Banco on-line') : mode === 'local' ? 'Modo local' : 'Conectando…';
+ const active = document.activeElement, keepSearch = active && active.id === 'search', pos = keepSearch ? active.selectionStart : 0;
+ let html;
+ if (mode === 'loading') html = loadingView();
+ else if (current === 'inicio') html = dashboard();
+ else if (current === 'portal') html = portal();
+ else if (current === 'banco') html = banco();
+ else if (current === 'acompanhamento') html = acompanhamento();
+ else html = listing(page.table);
+ if (current === 'portal' && !patientSession && $('loginForm')) { /* não recria o formulário de login enquanto digita */ return; }
+ $('view').innerHTML = html;
+ if (keepSearch && $('search')) { $('search').focus(); $('search').setSelectionRange(pos, pos); }
+}
+
+/* ===== Formulário ===== */
+function fieldHtml(f, row, isEdit){
+ let val = row && row[f.k] !== undefined ? row[f.k] : (!isEdit && f.def ? f.def() : '');
+ if (val == null) val = '';
+ const req = f.req && f.type !== 'password' ? 'required' : '';
+ const locked = isEdit && f.lockOnEdit;
+ let ctrl;
+ if (f.type === 'fk') {
+  let opts = data[f.ref].slice();
+  if (f.filter) opts = opts.filter(r => f.filter(r, row));
+  const lab = f.label || (r => r.NOME);
+  opts.sort((a,b)=>String(lab(a)).localeCompare(String(lab(b)),'pt-BR'));
+  ctrl = `<select name="${f.k}" ${req} ${locked?'disabled':''}><option value="">${f.req?'Selecione…':'— Nenhum —'}</option>${opts.map(r=>`<option value="${esc(r[PK[f.ref]])}" ${String(val)===String(r[PK[f.ref]])?'selected':''}>${esc(lab(r))}</option>`).join('')}</select>`;
+  if (locked) ctrl += `<input type="hidden" name="${f.k}" value="${esc(val)}">`;
+ } else if (f.type === 'enum') {
+  ctrl = `<select name="${f.k}" ${req}>${f.opts.map(o=>`<option ${String(val)===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
+ } else if (f.type === 'bool') {
+  ctrl = `<select name="${f.k}"><option value="1" ${Number(val)===1?'selected':''}>Sim</option><option value="0" ${val!==''&&Number(val)===0?'selected':''}>Não</option></select>`;
+ } else if (f.type === 'textarea') {
+  ctrl = `<textarea name="${f.k}" maxlength="${f.max||300}">${esc(val)}</textarea>`;
+ } else if (f.type === 'digits') {
+  ctrl = `<input name="${f.k}" inputmode="numeric" maxlength="${Math.max(...f.len)+6}" value="${esc(val)}" ${req} ${locked?'readonly':''}>`;
+ } else if (f.type === 'password') {
+  ctrl = `<input name="${f.k}" type="password" autocomplete="new-password" placeholder="${isEdit?'Deixe em branco para manter':'Mínimo de 6 caracteres'}">`;
+ } else {
+  ctrl = `<input name="${f.k}" type="${f.type}" value="${esc(val)}" ${f.max?`maxlength="${f.max}"`:''} ${req} ${locked?'readonly':''}>`;
+ }
+ return `<div class="field ${f.wide?'wide':''}"><label>${f.l}${f.req?' *':''}</label>${ctrl}${f.hint?`<small>${f.hint}</small>`:''}</div>`;
+}
+function openForm(t, id, prefill){
+ if (readOnly) { notify('Você está em modo somente leitura.', true); return; }
+ const need = {CONSULTA:[['PACIENTE','um paciente'],['MEDICO','um médico']],EXAME:[['PACIENTE','um paciente'],['TIPO_EXAME','um tipo de exame']],MEDICO:[['ESPECIALIDADE','uma especialidade']]}[t] || [];
+ for (const [tb, txt] of need) if (!data[tb].length) { notify(`Cadastre ${txt} primeiro.`, true); return; }
+ const row = id != null ? find(t, id) : null;
+ if (t === 'RESULTADO_EXAME' && !row && !data.EXAME.some(e => !resultOf(e.EXAME_ID) && ['Enviado ao laboratório','Em análise'].includes(e.SITUACAO))) { notify('Nenhum exame enviado ao laboratório aguardando resultado.', true); return; }
+ editing = {t, id: row ? row[PK[t]] : null};
+ const cfg = CFG[t];
+ $('modalTitle').textContent = (row ? 'Editar ' : (cfg.fem ? 'Nova ' : 'Novo ')) + cfg.sing;
+ $('entityForm').innerHTML = `<div class="formgrid">${cfg.fields.map(f=>fieldHtml(f,row||prefill||null,!!row)).join('')}</div><div class="formerror" id="formError"></div><div class="formactions"><button type="button" class="secondary" onclick="closeForm()">Cancelar</button><button type="submit" class="primary" id="saveBtn">Salvar registro</button></div>`;
+ $('formModal').classList.add('open');
+ const first = $('entityForm').querySelector('input:not([readonly]),select:not([disabled])'); if (first && window.innerWidth > 600) first.focus();
+}
+function closeForm(){ $('formModal').classList.remove('open'); editing = null; }
+function formError(msg){ const e = $('formError'); e.textContent = msg; e.classList.add('show'); e.scrollIntoView({block:'nearest'}); }
+
+function readForm(t){
+ const fd = new FormData($('entityForm')), row = {};
+ for (const f of CFG[t].fields) {
+  let v = fd.get(f.k); v = v == null ? '' : String(v).trim();
+  if (f.type === 'digits') v = digits(v);
+  if (f.type === 'fk') v = v === '' ? null : (f.ref === 'PACIENTE' ? v : Number(v));
+  else if (f.type === 'bool') v = Number(v);
+  else if (f.type === 'email') v = v.toLowerCase();
+  if (v === '') v = null;
+  row[f.k] = v;
+ }
+ return row;
+}
+function validate(t, r, old){
+ const cfg = CFG[t];
+ for (const f of cfg.fields) {
+  const v = r[f.k];
+  if (f.req && f.type !== 'password' && (v == null || v === '')) return `Preencha o campo "${f.l}".`;
+  if (v != null && f.type === 'digits' && !f.len.includes(String(v).length)) return `"${f.l}" precisa ter ${f.len.join(' ou ')} dígitos.`;
+  if (v != null && f.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return `Informe um e-mail válido em "${f.l}".`;
+ }
+ const same = (x) => old && String(x[PK[t]]) === String(old[PK[t]]);
+ const dup = (col, msg) => r[col] != null && data[t].some(x => !same(x) && String(x[col]).toLowerCase() === String(r[col]).toLowerCase()) ? msg : null;
+ switch (t) {
+  case 'ESPECIALIDADE': return dup('NOME','Já existe uma especialidade com esse nome.');
+  case 'TIPO_EXAME': return dup('NOME','Já existe um tipo de exame com esse nome.');
+  case 'MEDICO': return dup('CRM','Já existe médico com esse CRM.');
+  case 'LABORATORIO': return dup('CNPJ','Já existe laboratório com esse CNPJ.');
+  case 'PACIENTE':
+   if (!old && find('PACIENTE', r.PACIENTE_CPF)) return 'Já existe paciente com esse CPF.';
+   if (r.DATA_NASCIMENTO > today()) return 'A data de nascimento não pode ser no futuro.';
+   return null;
+  case 'USUARIO': {
+   const d = dup('EMAIL','Já existe usuário com esse e-mail.'); if (d) return d;
+   if (r.PERFIL === 'Paciente' && !r.PACIENTE_CPF) return 'O perfil Paciente precisa de um paciente vinculado.';
+   if (r.PERFIL !== 'Paciente') r.PACIENTE_CPF = null;
+   if (r.PACIENTE_CPF && data.USUARIO.some(x => !same(x) && x.PACIENTE_CPF === r.PACIENTE_CPF)) return 'Este paciente já possui usuário.';
+   if (!old && (!r.SENHA || r.SENHA.length < 6)) return 'Defina uma senha com pelo menos 6 caracteres.';
+   if (old && r.SENHA && r.SENHA.length < 6) return 'A nova senha precisa ter pelo menos 6 caracteres.';
+   return null;
+  }
+  case 'CONSULTA': {
+   const livre = s => !['Cancelada','Não compareceu'].includes(s);
+   if (livre(r.SITUACAO) && data.CONSULTA.some(x => !same(x) && String(x.MEDICO_ID) === String(r.MEDICO_ID) && x.DATA_CONSULTA === r.DATA_CONSULTA && x.HORA_CONSULTA === r.HORA_CONSULTA && livre(x.SITUACAO))) return 'Este médico já tem consulta nesse dia e horário.';
+   if (r.JUSTIFICATIVA_FALTA && r.SITUACAO !== 'Não compareceu') return 'A justificativa de falta só vale para a situação "Não compareceu".';
+   return null;
+  }
+  case 'EXAME': {
+   const tipo = find('TIPO_EXAME', r.TIPO_EXAME_ID);
+   const posColeta = ['Coletado','Enviado ao laboratório','Em análise','Resultado disponível'];
+   const posEnvio = ['Enviado ao laboratório','Em análise','Resultado disponível'];
+   if (tipo && Number(tipo.EXIGE_PEDIDO_MEDICO) === 1 && Number(r.PEDIDO_MEDICO_APRESENTADO) !== 1 && (r.DATA_COLETA || posColeta.includes(r.SITUACAO))) return 'Este tipo de exame exige pedido médico antes da coleta.';
+   if (posColeta.includes(r.SITUACAO) && !r.DATA_COLETA) return 'Informe a data da coleta.';
+   if (posEnvio.includes(r.SITUACAO) && !r.DATA_ENCAMINHAMENTO) return 'Informe a data do encaminhamento ao laboratório.';
+   if ((r.DATA_ENCAMINHAMENTO || posEnvio.includes(r.SITUACAO)) && !r.LABORATORIO_ID) return 'Informe o laboratório responsável pelo encaminhamento.';
+   if (r.DATA_ENCAMINHAMENTO && !r.DATA_COLETA) return 'Não há encaminhamento sem coleta: informe a data da coleta.';
+   if (r.DATA_COLETA && r.DATA_ENCAMINHAMENTO && r.DATA_ENCAMINHAMENTO < r.DATA_COLETA) return 'O encaminhamento não pode ser antes da coleta.';
+   if (r.PREVISAO_ENTREGA && r.DATA_COLETA && r.PREVISAO_ENTREGA < r.DATA_COLETA) return 'A previsão do resultado não pode ser antes da coleta.';
+   const temRes = old && resultOf(old.EXAME_ID);
+   if (r.SITUACAO === 'Resultado disponível' && !temRes) return 'Para marcar "Resultado disponível", registre o resultado na tela Resultados (a situação muda sozinha).';
+   if (temRes && r.SITUACAO !== 'Resultado disponível') return 'Este exame já tem resultado liberado. Exclua o resultado antes de mudar a situação.';
+   return null;
+  }
+  case 'RESULTADO_EXAME':
+   if (!old && resultOf(r.EXAME_ID)) return 'Este exame já tem resultado (é permitido apenas um resultado por exame).';
+   if (!/\.pdf$/i.test(r.ARQUIVO_PDF || '')) return 'O nome do arquivo precisa terminar em .pdf';
+   return null;
+ }
+ return null;
+}
+$('entityForm').addEventListener('submit', async e => {
+ e.preventDefault();
+ if (!editing) return;
+ const {t, id} = editing, old = id != null ? find(t, id) : null;
+ const r = readForm(t);
+ const err = validate(t, r, old);
+ if (err) { formError(err); return; }
+ const btn = $('saveBtn'); btn.disabled = true; btn.textContent = 'Salvando…';
+ try {
+  const row = Object.assign({}, old || {}, r);
+  if (!old) row[PK[t]] = t === 'PACIENTE' ? r.PACIENTE_CPF : nextId(t);
+  if (t === 'USUARIO') {
+   if (r.SENHA) { const h = await sha256(r.SENHA); if (!h) throw {code:'hash'}; row.SENHA_HASH = h; }
+   delete row.SENHA;
+   if (!old) row.DATA_CADASTRO = nowLocal();
+  }
+  await writeRow(t, row);
+  if (t === 'RESULTADO_EXAME') {
+   const ex = find('EXAME', row.EXAME_ID);
+   if (ex && ex.SITUACAO !== 'Resultado disponível') await writeRow('EXAME', Object.assign({}, ex, {SITUACAO:'Resultado disponível'}));
+  }
+  closeForm(); render(); notify('Registro salvo com sucesso.');
+ } catch (ex) {
+  btn.disabled = false; btn.textContent = 'Salvar registro';
+  formError(ex && ex.code === 'hash' ? 'Este navegador não conseguiu gerar o hash da senha.' : dbErrorMessage(ex));
+ }
+});
+
+async function removeRow(t, id){
+ const deps = {
+  ESPECIALIDADE:[['MEDICO','ESPECIALIDADE_ID','médicos']],
+  MEDICO:[['CONSULTA','MEDICO_ID','consultas']],
+  PACIENTE:[['CONSULTA','PACIENTE_CPF','consultas'],['EXAME','PACIENTE_CPF','exames'],['USUARIO','PACIENTE_CPF','usuário']],
+  TIPO_EXAME:[['EXAME','TIPO_EXAME_ID','exames']],
+  LABORATORIO:[['EXAME','LABORATORIO_ID','exames']],
+  EXAME:[['RESULTADO_EXAME','EXAME_ID','resultado']]
+ }[t] || [];
+ for (const [tb, col, txt] of deps) if (data[tb].some(x => String(x[col]) === String(id))) { notify(`Não é possível excluir: existe ${txt} ligado a este registro.`, true); return; }
+ const ok = await askConfirm('Excluir registro', t === 'RESULTADO_EXAME' ? 'O resultado será removido e o exame voltará para "Em análise". Deseja continuar?' : 'Deseja excluir este registro? Essa ação não pode ser desfeita.', 'Excluir');
+ if (!ok) return;
+ try {
+  const old = find(t, id);
+  await deleteRow(t, id);
+  if (t === 'RESULTADO_EXAME' && old) { const ex = find('EXAME', old.EXAME_ID); if (ex && ex.SITUACAO === 'Resultado disponível') await writeRow('EXAME', Object.assign({}, ex, {SITUACAO:'Em análise'})); }
+  render(); notify('Registro excluído.');
+ } catch (ex) { notify(dbErrorMessage(ex), true); }
+}
+async function registerReminder(id){
+ const c = find('CONSULTA', id); if (!c) return;
+ if (readOnly) { notify('Você está em modo somente leitura.', true); return; }
+ try { await writeRow('CONSULTA', Object.assign({}, c, {DATA_LEMBRETE: nowLocal()})); render(); notify('Contato de lembrete registrado.'); }
+ catch (ex) { notify(dbErrorMessage(ex), true); }
+}
+async function resetLocal(){
+ if (!await askConfirm('Restaurar dados', 'Apagar as alterações deste navegador e voltar aos dados fictícios iniciais?', 'Restaurar')) return;
+ try { localStorage.removeItem(LOCAL_KEY); } catch {}
+ loadLocal(); render(); notify('Dados de exemplo restaurados.');
+}
+
+/* ===== Exportação ===== */
+async function offerFile(filename, payload){
+ const dl = await getDownloads();
+ if (dl) {
+  try { await dl.save({filename, data: payload}); notify('Arquivo pronto.'); }
+  catch (e) { if (e && e.code !== 'declined') notify('Não foi possível baixar o arquivo aqui.', true); }
+  return;
+ }
+ try {
+  const blob = payload instanceof Blob ? payload : new Blob([payload]);
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+ } catch { notify('Não foi possível baixar o arquivo neste ambiente.', true); }
+}
+function loadXlsx(){
+ if (window.XLSX) return Promise.resolve(window.XLSX);
+ return new Promise((res, rej) => { const s = document.createElement('script'); s.src = XLSX_URL; s.onload = () => res(window.XLSX); s.onerror = rej; document.head.appendChild(s); });
+}
+async function exportXlsx(){
+ const btn = $('btnXlsx'); if (btn) { btn.disabled = true; btn.textContent = 'Gerando…'; }
+ try {
+  const X = await loadXlsx();
+  const wb = X.utils.book_new();
+  TABLES.forEach(t => {
+   const rows = data[t].slice().sort((a,b)=>String(a[PK[t]]).localeCompare(String(b[PK[t]]),undefined,{numeric:true})).map(r => { const o = {}; COLUMNS[t].forEach(c => o[c] = r[c] == null ? '' : (DATETIME_COLS.has(c) ? String(r[c]).replace('T',' ') : r[c])); return o; });
+   const ws = X.utils.json_to_sheet(rows, {header: COLUMNS[t]});
+   ws['!cols'] = COLUMNS[t].map(c => ({wch: Math.max(c.length + 2, 14)}));
+   X.utils.book_append_sheet(wb, ws, t);
+  });
+  const buf = X.write(wb, {bookType:'xlsx', type:'array'});
+  await offerFile('clinica_adolfo_lutz_dados.xlsx', new Blob([buf]));
+ } catch { notify('Não foi possível gerar a planilha agora.', true); }
+ finally { if (btn) { btn.disabled = false; btn.textContent = '⬇ Baixar planilha .xlsx'; } }
+}
+function sqlValue(col, v){
+ if (v == null || v === '') return 'NULL';
+ if (typeof v === 'number') return String(v);
+ let s = String(v);
+ if (DATETIME_COLS.has(col)) s = s.replace('T',' ') + (s.length === 16 ? ':00' : '');
+ if (col === 'HORA_CONSULTA' && s.length === 5) s += ':00';
+ return "'" + s.replace(/\\/g,'\\\\').replace(/'/g,"''") + "'";
+}
+function exportSql(){
+ const lines = ['-- Dados exportados do site da Clínica Médica Adolfo Lutz', '-- Gerado em ' + fmtDT(nowLocal()), '-- Rode depois do script do modelo físico (CREATE TABLE).', '', 'USE `clinica_adolfo_lutz`;', ''];
+ TABLES.forEach(t => {
+  const rows = data[t].slice().sort((a,b)=>String(a[PK[t]]).localeCompare(String(b[PK[t]]),undefined,{numeric:true}));
+  if (!rows.length) return;
+  lines.push(`INSERT INTO \`${t}\` (${COLUMNS[t].map(c=>'`'+c+'`').join(', ')}) VALUES`);
+  lines.push(rows.map(r => '  (' + COLUMNS[t].map(c => sqlValue(c, r[c])).join(', ') + ')').join(',\n') + ';', '');
+ });
+ offerFile('clinica_adolfo_lutz_inserts.sql', lines.join('\n'));
+}
+
+/* ===== Início ===== */
+$('formModal').addEventListener('click', e => { if (e.target.id === 'formModal') closeForm(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeForm(); } });
+init();
+</script>
+</body>
+</html>
